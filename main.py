@@ -74,41 +74,23 @@ def distance_matrix(X, metric='euclidean', p=3):
     else:
         return cdist(X, X, metric=metric)
 
-def stress(X_flat, D, n, dim, W=None):
-    X = X_flat.reshape((n, dim))
-    D_hat = pairwise_distances(X)
-    if W is None:
-        W = np.ones_like(D)
-    return 0.5 * np.sum(W * (D - D_hat)**2)
 
-def compute_mds(D, dim=2, init_X=None, W=None, solver='L-BFGS-B'):
-    n = D.shape[0]
+#https://en.wikipedia.org/wiki/Stress_majorization#The_SMACOF_algorithm
 
-    if init_X is None:
-        init_coords = np.random.uniform(
-            low=-1.0, high=1.0, size=(n, dim)
-            )
-    else:
-        init_coords = init_X
-
-    x0 = init_coords.ravel()
-
-    # minimalizacja
-    res = minimize(
-        fun=stress,
-        x0=x0,
-        args=(D, n, dim, W),
-        method=solver,
-        options={'maxiter': 1500, 'ftol': 1e-6}
-    )
-
-    X_opt = res.x.reshape((n, dim))
-    final_stress = res.fun
-    return X_opt, final_stress
 
 # def compute_mds():
-#     # hard, todo
+#     # todo
 #     return
+
+
+    # The SMACOF algorithm for metric MDS can be summarized by the following
+    # steps:
+
+    # 1. Set an initial start configuration, randomly or not.
+    # 2. Compute the stress
+    # 3. Compute the Guttman Transform
+    # 4. Iterate 2 and 3 until convergence.
+# https://scikit-learn.org/stable/modules/generated/sklearn.manifold.smacof.html#sklearn.manifold.smacof
 
 def main():
     args = parse_args()
@@ -120,8 +102,8 @@ def main():
     else:
         D = data
     
-    cords = compute_mds(D, dim=args.dim) #solver=
-    print(cords)
+    # cords = compute_mds(D, dim=args.dim) #solver=
+    # print(cords)
     #Q = compute_quality(D, coords)
     #plot_and_save()
     return
